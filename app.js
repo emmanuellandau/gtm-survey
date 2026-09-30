@@ -5,7 +5,7 @@
    ============================================================ */
 
 // >>> Paste the Clay webhook URL here when ready. Leave "" to test locally. <<<
-const CLAY_WEBHOOK_URL = "";
+const CLAY_WEBHOOK_URL = "https://api.clay.com/v3/sources/webhook/pull-in-data-from-a-webhook-85591784-59f9-4594-a89b-20e59f384a62";
 
 /* ---------- Static UI strings ---------- */
 const T = {
