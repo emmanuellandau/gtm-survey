@@ -446,16 +446,21 @@ async function submit() {
 
   try {
     if (CLAY_WEBHOOK_URL) {
-      // Clay's webhook doesn't return CORS headers, so we send a "simple" request
-      // (text/plain body, no-cors) that skips the preflight. The response is opaque
-      // and can't be read, but a resolved promise means the POST was delivered.
-      // Clay parses the JSON body regardless of the text/plain content type.
-      await fetch(CLAY_WEBHOOK_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "text/plain;charset=UTF-8" },
-        body: JSON.stringify(payload),
-      });
+      // Clay's webhook returns Cross-Origin-Resource-Policy: same-origin and no CORS
+      // headers, which blocks both a normal fetch and a no-cors fetch from reading /
+      // completing. navigator.sendBeacon fires the POST and never touches the response,
+      // so CORP/CORS don't apply. It sends a "simple" text/plain body that Clay parses
+      // as JSON. Returns true if the request was queued by the browser.
+      const blob = new Blob([JSON.stringify(payload)], { type: "text/plain;charset=UTF-8" });
+      const queued = navigator.sendBeacon && navigator.sendBeacon(CLAY_WEBHOOK_URL, blob);
+      if (!queued) {
+        // fallback for browsers without sendBeacon: fire-and-forget no-cors POST
+        fetch(CLAY_WEBHOOK_URL, {
+          method: "POST", mode: "no-cors", keepalive: true,
+          headers: { "Content-Type": "text/plain;charset=UTF-8" },
+          body: JSON.stringify(payload),
+        }).catch(() => {});
+      }
     } else {
       // local test mode: no webhook configured yet
       console.log("[GTM survey] no webhook set. Payload:", payload);
