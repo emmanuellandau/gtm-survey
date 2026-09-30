@@ -4,8 +4,11 @@
    POSTs the collected answers to a Clay webhook.
    ============================================================ */
 
-// >>> Paste the Clay webhook URL here when ready. Leave "" to test locally. <<<
-const CLAY_WEBHOOK_URL = "https://api.clay.com/v3/sources/webhook/pull-in-data-from-a-webhook-85591784-59f9-4594-a89b-20e59f384a62";
+// Submissions POST here. This is an n8n webhook (CORS-enabled) that forwards
+// server-side to Clay — Clay's own webhook blocks direct browser posts (CORP).
+// n8n workflow: "GTM Survey → Clay proxy (CORS)" (id HEP8uhjNwX2nSATs).
+// Leave "" to test locally (logs payload to console).
+const WEBHOOK_URL = "https://greenly.app.n8n.cloud/webhook/gtm-survey";
 
 /* ---------- Static UI strings ---------- */
 const T = {
@@ -475,22 +478,16 @@ async function submit() {
   btn.textContent = L(T.sending);
 
   try {
-    if (CLAY_WEBHOOK_URL) {
-      // Clay's webhook returns Cross-Origin-Resource-Policy: same-origin and no CORS
-      // headers, which blocks both a normal fetch and a no-cors fetch from reading /
-      // completing. navigator.sendBeacon fires the POST and never touches the response,
-      // so CORP/CORS don't apply. It sends a "simple" text/plain body that Clay parses
-      // as JSON. Returns true if the request was queued by the browser.
-      const blob = new Blob([JSON.stringify(payload)], { type: "text/plain;charset=UTF-8" });
-      const queued = navigator.sendBeacon && navigator.sendBeacon(CLAY_WEBHOOK_URL, blob);
-      if (!queued) {
-        // fallback for browsers without sendBeacon: fire-and-forget no-cors POST
-        fetch(CLAY_WEBHOOK_URL, {
-          method: "POST", mode: "no-cors", keepalive: true,
-          headers: { "Content-Type": "text/plain;charset=UTF-8" },
-          body: JSON.stringify(payload),
-        }).catch(() => {});
-      }
+    if (WEBHOOK_URL) {
+      // POST to the n8n proxy, which forwards server-side to Clay. The proxy
+      // returns proper CORS headers, so a normal fetch works and we can confirm
+      // delivery from the response.
+      const res = await fetch(WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error("HTTP " + res.status);
     } else {
       // local test mode: no webhook configured yet
       console.log("[GTM survey] no webhook set. Payload:", payload);
