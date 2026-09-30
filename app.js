@@ -52,7 +52,7 @@ const TEAM = [
   {v:"europe",        en:"Europe",        fr:"Europe"},
   {v:"france",        en:"France",        fr:"France"},
   {v:"uk",            en:"UK",            fr:"UK"},
-  {v:"international", en:"International", fr:"International"},
+  {v:"us",            en:"US",            fr:"US"},
 ];
 const FREQ = [
   {v:"daily",   en:"Daily",   fr:"Quotidiennement"},
