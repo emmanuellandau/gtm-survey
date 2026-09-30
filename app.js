@@ -24,6 +24,7 @@ const T = {
   qKnow:     { en: "Do you know this process?", fr: "Connais-tu ce process ?" },
   qFreq:     { en: "How often do you use it?", fr: "À quelle fréquence l'utilises-tu ?" },
   qUseful:   { en: "Do you think it's useful?", fr: "Le trouves-tu utile ?" },
+  starsHint: { en: "Rate from 1 to 5 stars", fr: "Note de 1 à 5 étoiles" },
   qWhyNot:   { en: "If you don't use it, why not?", fr: "Si tu ne l'utilises pas, pourquoi ?" },
   qWhyNotHint:{ en: "select all that apply", fr: "plusieurs choix possibles" },
   qComment:  { en: "Anything to add? (bugs, ideas, what would make it better)", fr: "Un commentaire ? (bugs, idées, ce qui l'améliorerait)" },
@@ -61,12 +62,15 @@ const FREQ = [
   {v:"rarely",  en:"Rarely",  fr:"Rarement"},
   {v:"never",   en:"Never",   fr:"Jamais"},
 ];
-const USEFUL = [
-  {v:"very",     en:"Very useful",     fr:"Très utile"},
-  {v:"somewhat", en:"Somewhat useful", fr:"Plutôt utile"},
-  {v:"not",      en:"Not useful",      fr:"Pas utile"},
-  {v:"unsure",   en:"Not sure",        fr:"Je ne sais pas"},
-];
+// 1-5 star rating for usefulness (anchored labels at 1 / 3 / 5)
+const USEFUL_LABELS = {
+  1: {en:"Not useful",      fr:"Pas utile"},
+  2: {en:"Slightly useful", fr:"Peu utile"},
+  3: {en:"Somewhat useful", fr:"Plutôt utile"},
+  4: {en:"Useful",          fr:"Utile"},
+  5: {en:"Very useful",     fr:"Très utile"},
+};
+const STAR_SVG = '<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path d="M12 2.6l2.9 5.88 6.49.94-4.7 4.58 1.11 6.46L12 17.9l-5.8 3.05 1.1-6.46-4.69-4.58 6.49-.94z"/></svg>';
 const WHYNOT = [
   {v:"unaware",   en:"I didn't know it existed",      fr:"Je ne savais pas que ça existait"},
   {v:"noproblem", en:"It's not a problem I have",     fr:"Ce n'est pas un besoin pour moi"},
@@ -215,6 +219,31 @@ function pillGroup(options, selected, onSelect, multi=false) {
   return wrap;
 }
 
+/* 1-5 star rating with a dynamic label + anchor legend */
+function starRating(value, onSelect) {
+  const wrap = el("div", "stars-wrap");
+  const row = el("div", "stars");
+  const label = el("div", "stars-label");
+  const setLabel = v => { label.textContent = v ? `${v}/5 · ${L(USEFUL_LABELS[v])}` : L(T.starsHint); };
+  const paint = upto => [...row.children].forEach((s, i) => s.classList.toggle("on", i < upto));
+  for (let i = 1; i <= 5; i++) {
+    const star = el("button", "star" + (value && i <= value ? " on" : ""));
+    star.type = "button";
+    star.innerHTML = STAR_SVG;
+    star.setAttribute("aria-label", `${i}/5`);
+    star.addEventListener("mouseenter", () => { paint(i); setLabel(i); });
+    star.addEventListener("mouseleave", () => { paint(value || 0); setLabel(value || 0); });
+    star.addEventListener("click", () => onSelect(i));
+    row.appendChild(star);
+  }
+  setLabel(value || 0);
+  wrap.appendChild(row);
+  wrap.appendChild(label);
+  wrap.appendChild(el("div", "stars-legend",
+    `1 = ${L(USEFUL_LABELS[1])} · 3 = ${L(USEFUL_LABELS[3])} · 5 = ${L(USEFUL_LABELS[5])}`));
+  return wrap;
+}
+
 function questionBlock(labelText, node, hint, missing) {
   const q = el("div", "q" + (missing ? " missing" : ""));
   const flag = missing ? ` <span class="miss-flag">(${L(T.requiredMark)})</span>` : "";
@@ -359,11 +388,11 @@ function processCard(p, idx) {
     ));
   }
 
-  // Q3: usefulness (once they've answered know)
+  // Q3: usefulness (1-5 stars, once they've answered know)
   if (a.know) {
     card.appendChild(questionBlock(
       L(T.qUseful),
-      pillGroup(USEFUL, a.useful, v => { a.useful = v; render(); }),
+      starRating(a.useful, v => { a.useful = v; render(); }),
       null, isMissing("useful")
     ));
   }
@@ -415,7 +444,8 @@ function buildPayload() {
         process_name: p.name.en,
         knows_it: a.know,
         frequency: a.know === "yes" ? a.freq : null,
-        usefulness: a.useful,
+        usefulness_stars: a.useful,
+        usefulness_label: a.useful ? USEFUL_LABELS[a.useful].en : null,
         reasons_not_using: a.whynot,
         comment: a.comment.trim(),
       };
