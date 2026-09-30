@@ -446,12 +446,16 @@ async function submit() {
 
   try {
     if (CLAY_WEBHOOK_URL) {
-      const res = await fetch(CLAY_WEBHOOK_URL, {
+      // Clay's webhook doesn't return CORS headers, so we send a "simple" request
+      // (text/plain body, no-cors) that skips the preflight. The response is opaque
+      // and can't be read, but a resolved promise means the POST was delivered.
+      // Clay parses the JSON body regardless of the text/plain content type.
+      await fetch(CLAY_WEBHOOK_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=UTF-8" },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error("HTTP " + res.status);
     } else {
       // local test mode: no webhook configured yet
       console.log("[GTM survey] no webhook set. Payload:", payload);
