@@ -1,5 +1,5 @@
 /* ============================================================
-   GTM Process Survey — Greenly
+   GTM Process Survey (Greenly)
    Bilingual (EN/FR), role/team capture, per-process questions,
    POSTs the collected answers to a Clay webhook.
    ============================================================ */
@@ -30,16 +30,16 @@ const T = {
   commentPh: { en: "Optional…", fr: "Optionnel…" },
 
   magicTitle:{ en: "One last thing 🪄", fr: "Une dernière chose 🪄" },
-  magicQ:    { en: "If you had a magic wand, what would you want us to build, automate or fix next? Tell us your biggest day-to-day pains — what slows you down, what data you wish you had, what you do manually today.", fr: "Si tu avais une baguette magique, qu'est-ce que tu voudrais qu'on construise, automatise ou corrige en priorité ? Dis-nous tes plus grosses galères au quotidien — ce qui te ralentit, les données qui te manquent, ce que tu fais à la main aujourd'hui." },
-  magicPh:   { en: "Dream big — no idea is too small or too crazy…", fr: "Vois grand — aucune idée n'est trop petite ou trop folle…" },
+  magicQ:    { en: "If you had a magic wand, what would you want us to build, automate or fix next? Tell us your biggest day-to-day pains. What slows you down, what data you wish you had, what you do manually today.", fr: "Si tu avais une baguette magique, qu'est-ce que tu voudrais qu'on construise, automatise ou corrige en priorité ? Dis-nous tes plus grosses galères au quotidien. Ce qui te ralentit, les données qui te manquent, ce que tu fais à la main aujourd'hui." },
+  magicPh:   { en: "Dream big. No idea is too small or too crazy…", fr: "Vois grand. Aucune idée n'est trop petite ou trop folle…" },
   submit:    { en: "Submit survey", fr: "Envoyer l'enquête" },
   sending:   { en: "Sending…", fr: "Envoi…" },
   progress:  { en: (d,t)=>`${d} of ${t} sections complete`, fr: (d,t)=>`${d} section(s) sur ${t} complétée(s)` },
   needRole:  { en: "Please select your role first.", fr: "Merci de sélectionner ton rôle d'abord." },
-  needAll:   { en: "Please answer every question before submitting — see the sections marked in red.", fr: "Merci de répondre à toutes les questions avant d'envoyer — voir les sections en rouge." },
+  needAll:   { en: "Please answer every question before submitting. See the sections marked in red.", fr: "Merci de répondre à toutes les questions avant d'envoyer. Voir les sections en rouge." },
   requiredMark:{ en: "required", fr: "obligatoire" },
-  ok:        { en: "Thanks — your answers were recorded.", fr: "Merci — tes réponses ont été enregistrées." },
-  err:       { en: "Couldn't reach the server. Your answers were saved locally — try again.", fr: "Serveur injoignable. Réponses sauvegardées localement — réessaie." },
+  ok:        { en: "Thanks, your answers were recorded.", fr: "Merci, tes réponses ont été enregistrées." },
+  err:       { en: "Couldn't reach the server. Your answers were saved locally, please try again.", fr: "Serveur injoignable. Réponses sauvegardées localement, réessaie." },
   thanksT:   { en: "Thank you!", fr: "Merci !" },
   thanksP:   { en: "Your feedback has been sent to the GTM team.", fr: "Ton feedback a bien été transmis à l'équipe GTM." },
   placeholder:{ en: "Screenshot to be added", fr: "Capture à ajouter" },
@@ -87,7 +87,7 @@ const PROCESSES = [
       fr: "Trouve et renseigne le téléphone fixe & mobile d'un contact HubSpot pour appeler sans quitter la fiche."
     },
     where: { en: "HubSpot contact record → <b>“Need a Phone Number?”</b> card", fr: "Fiche contact HubSpot → carte <b>« Need a Phone Number? »</b>" },
-    shots: [ { src: "assets/img/phone-enrichment.png", cap: { en: "Contact record — phone card", fr: "Fiche contact — carte téléphone" } } ],
+    shots: [ { src: "assets/img/phone-enrichment.png", cap: { en: "Contact record, phone card", fr: "Fiche contact, carte téléphone" } } ],
   },
   {
     id: "contact_sourcing",
@@ -96,8 +96,8 @@ const PROCESSES = [
       en: "Finds net-new ICP contacts at a target company and pushes them into HubSpot, ready to work.",
       fr: "Trouve de nouveaux contacts ICP dans une entreprise cible et les pousse dans HubSpot, prêts à travailler."
     },
-    where: { en: "Slack <b>#ask-your-gtm</b> channel", fr: "Canal Slack <b>#ask-your-gtm</b>" },
-    shots: [ { src: "assets/img/contact-sourcing.png", cap: { en: "#ask-your-gtm — contact sourcing", fr: "#ask-your-gtm — sourcing contacts" } } ],
+    where: { en: "HubSpot record, <b>“Get More Prospect”</b> card", fr: "Fiche HubSpot, carte <b>« Get More Prospect »</b>" },
+    shots: [ { src: "assets/img/contact-sourcing.png", cap: { en: "Get More Prospect card", fr: "Carte Get More Prospect" } } ],
   },
   {
     id: "decision_maker_sourcing",
@@ -106,15 +106,15 @@ const PROCESSES = [
       en: "Identifies the right decision-makers (senior Sustainability / ESG / CSR personas) at an account.",
       fr: "Identifie les bons décideurs (personas Sustainability / ESG / RSE seniors) sur un compte."
     },
-    where: { en: "Slack <b>#ask-your-gtm</b> channel", fr: "Canal Slack <b>#ask-your-gtm</b>" },
-    shots: [ { src: "assets/img/decision-maker-sourcing.png", cap: { en: "#ask-your-gtm — decision makers", fr: "#ask-your-gtm — décideurs" } } ],
+    where: { en: "HubSpot record, <b>“Get More Prospect”</b> card (Is there a Decision Maker?)", fr: "Fiche HubSpot, carte <b>« Get More Prospect »</b> (Is there a Decision Maker?)" },
+    shots: [ { src: "assets/img/decision-maker-sourcing.png", cap: { en: "Get More Prospect card", fr: "Carte Get More Prospect" } } ],
   },
   {
     id: "gtm_insight_generator",
     name: { en: "GTM Insight generator", fr: "Générateur de GTM Insight" },
     desc: {
-      en: "AI-generated ESG intel on a company — last ADEME/BEGES report, scopes covered, maturity — plus a GTM fit score, surfaced right on the record.",
-      fr: "Intel ESG généré par IA sur une entreprise — dernier bilan ADEME/BEGES, scopes couverts, maturité — plus un GTM Score, directement sur la fiche."
+      en: "AI-generated ESG intel on a company (last ADEME/BEGES report, scopes covered, maturity), plus a GTM fit score, surfaced right on the record.",
+      fr: "Intel ESG généré par IA sur une entreprise (dernier bilan ADEME/BEGES, scopes couverts, maturité), plus un GTM Score, directement sur la fiche."
     },
     where: { en: "Contact record <b>“GTM Insight”</b> card, company record <b>“IA Insight by GTM”</b>, and <b>GTM Score</b> under GTM Tools", fr: "Carte <b>« GTM Insight »</b> (contact), <b>« IA Insight by GTM »</b> (entreprise) et <b>GTM Score</b> dans GTM Tools" },
     shots: [
@@ -130,7 +130,7 @@ const PROCESSES = [
       fr: "Flux de lead-gen automatisés (Apollo / SalesNav) qui construisent des listes de prospects pour les SDR à la demande."
     },
     where: { en: "Slack <b>#ask-your-gtm</b> → <b>Apollo LeadGen</b> / <b>SalesNav LeadGen</b>", fr: "Slack <b>#ask-your-gtm</b> → <b>Apollo LeadGen</b> / <b>SalesNav LeadGen</b>" },
-    shots: [ { src: "assets/img/leadgen-buttons.png", cap: { en: "#ask-your-gtm — LeadGen buttons", fr: "#ask-your-gtm — boutons LeadGen" } } ],
+    shots: [ { src: "assets/img/leadgen-buttons.png", cap: { en: "LeadGen buttons in #ask-your-gtm", fr: "Boutons LeadGen dans #ask-your-gtm" } } ],
   },
   {
     id: "auto_leadgen_ae",
@@ -140,7 +140,7 @@ const PROCESSES = [
       fr: "Le même moteur de lead-gen, calibré pour la génération de pipe et l'expansion de comptes des AE."
     },
     where: { en: "Slack <b>#ask-your-gtm</b> → <b>Apollo LeadGen</b> / <b>SalesNav LeadGen</b>", fr: "Slack <b>#ask-your-gtm</b> → <b>Apollo LeadGen</b> / <b>SalesNav LeadGen</b>" },
-    shots: [ { src: "assets/img/leadgen-buttons.png", cap: { en: "#ask-your-gtm — LeadGen buttons", fr: "#ask-your-gtm — boutons LeadGen" } } ],
+    shots: [ { src: "assets/img/leadgen-buttons.png", cap: { en: "LeadGen buttons in #ask-your-gtm", fr: "Boutons LeadGen dans #ask-your-gtm" } } ],
   },
   {
     id: "influ2_automation",
@@ -150,7 +150,7 @@ const PROCESSES = [
       fr: "Pousse automatiquement les contacts ciblés dans les campagnes ABM Influ2, pour que les décideurs voient les pubs Greenly avant ton approche."
     },
     where: { en: "Slack <b>#ask-your-gtm</b> → <b>Influ2 Leads</b>", fr: "Slack <b>#ask-your-gtm</b> → <b>Influ2 Leads</b>" },
-    shots: [ { src: "assets/img/influ2-leads.png", cap: { en: "#ask-your-gtm — Influ2 Leads", fr: "#ask-your-gtm — Influ2 Leads" } } ],
+    shots: [ { src: "assets/img/influ2-leads.png", cap: { en: "Influ2 Leads in #ask-your-gtm", fr: "Influ2 Leads dans #ask-your-gtm" } } ],
   },
   {
     id: "company_size_refresh",
@@ -160,7 +160,7 @@ const PROCESSES = [
       fr: "Maintient à jour automatiquement les champs effectif / taille d'entreprise dans HubSpot, pour une segmentation et un routage justes."
     },
     where: { en: "Runs in the background on the HubSpot company record", fr: "Tourne en arrière-plan sur la fiche entreprise HubSpot" },
-    shots: [ { src: "assets/img/company-size-refresh.png", cap: { en: "Company record — size field", fr: "Fiche entreprise — champ taille" } } ],
+    shots: [ { src: "assets/img/company-size-refresh.png", cap: { en: "Company record, Company Size Refresh", fr: "Fiche entreprise, Company Size Refresh" } } ],
   },
   {
     id: "vertical_mapping",
@@ -171,7 +171,7 @@ const PROCESSES = [
       fr: "Mappe automatiquement une entreprise à son vertical / secteur Greenly, pour un message, des références et des playbooks pertinents."
     },
     where: { en: "HubSpot company record (sector / vertical field)", fr: "Fiche entreprise HubSpot (champ secteur / vertical)" },
-    shots: [ { src: "assets/img/vertical-mapping.png", cap: { en: "Company record — vertical field", fr: "Fiche entreprise — champ vertical" } } ],
+    shots: [ { src: "assets/img/vertical-mapping.png", cap: { en: "Company record, Sub-Vertical Check", fr: "Fiche entreprise, Sub-Vertical Check" } } ],
   },
 ];
 
@@ -217,7 +217,7 @@ function pillGroup(options, selected, onSelect, multi=false) {
 
 function questionBlock(labelText, node, hint, missing) {
   const q = el("div", "q" + (missing ? " missing" : ""));
-  const flag = missing ? ` <span class="miss-flag">— ${L(T.requiredMark)}</span>` : "";
+  const flag = missing ? ` <span class="miss-flag">(${L(T.requiredMark)})</span>` : "";
   const lab = el("div", "label", labelText + (hint ? ` <span class="hint">(${hint})</span>` : "") + flag);
   q.appendChild(lab);
   q.appendChild(node);
@@ -323,7 +323,7 @@ function processCard(p, idx) {
   card.appendChild(el("p", "desc", L(p.desc)));
   card.appendChild(el("p", "where", `<b>${L(T.whereFind)}:</b> ${L(p.where)}`));
 
-  // screenshots — collapse cleanly if the file isn't there yet
+  // screenshots: collapse cleanly if the file isn't there yet
   if (p.shots && p.shots.length) {
     const shots = el("div", "shots");
     p.shots.forEach(s => {
@@ -343,14 +343,14 @@ function processCard(p, idx) {
     card.appendChild(shots);
   }
 
-  // Q1 — know
+  // Q1: know
   card.appendChild(questionBlock(
     `${L(T.qKnow)}<span class="req">*</span>`,
     pillGroup(KNOW, a.know, v => { a.know = v; render(); }),
     null, isMissing("know")
   ));
 
-  // Q2 — frequency (only if known)
+  // Q2: frequency (only if known)
   if (a.know === "yes") {
     card.appendChild(questionBlock(
       L(T.qFreq),
@@ -359,7 +359,7 @@ function processCard(p, idx) {
     ));
   }
 
-  // Q3 — usefulness (always once they've answered know)
+  // Q3: usefulness (once they've answered know)
   if (a.know) {
     card.appendChild(questionBlock(
       L(T.qUseful),
@@ -368,7 +368,7 @@ function processCard(p, idx) {
     ));
   }
 
-  // Q4 — why not (if unknown, or known but rarely/never)
+  // Q4: why not (if unknown, or known but rarely/never)
   const showWhy = a.know === "no" || (a.know === "yes" && (a.freq === "rarely" || a.freq === "never"));
   if (showWhy) {
     card.appendChild(questionBlock(
@@ -382,7 +382,7 @@ function processCard(p, idx) {
     ));
   }
 
-  // Q5 — comment
+  // Q5: comment
   if (a.know) {
     const ta = el("textarea");
     ta.placeholder = L(T.commentPh);
@@ -453,7 +453,7 @@ async function submit() {
       });
       if (!res.ok) throw new Error("HTTP " + res.status);
     } else {
-      // local test mode — no webhook configured yet
+      // local test mode: no webhook configured yet
       console.log("[GTM survey] no webhook set. Payload:", payload);
       await new Promise(r => setTimeout(r, 500));
     }
